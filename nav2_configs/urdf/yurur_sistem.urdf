@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="yurur_sistem">
+  <!-- Base Footprint Link -->
+  <link name="base_footprint">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.01"/> <!-- Small marker for visualization -->
+      </geometry>
+      <material name="gray">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.00570312168772415 0.000151801960803027 -0.0923341817437777"
+        rpy="0 0 0" />
+      <mass
+        value="11.5195772133628" />
+      <inertia
+        ixx="0.148428323286621"
+        ixy="-8.58954566999392E-12"
+        ixz="6.04020425405653E-07"
+        iyy="0.423384245651545"
+        iyz="-1.78166782114928E-11"
+        izz="0.566665472509856" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="sag_link">
+    <inertial>
+      <origin
+        xyz="0.00139121631902185 -0.00058744511932679 -0.164067775067871"
+        rpy="0 0 0" />
+      <mass
+        value="8.88197507026593" />
+      <inertia
+        ixx="0.0284719473379206"
+        ixy="-2.8636090809314E-05"
+        ixz="-0.000253028217404479"
+        iyy="0.084058942186055"
+        iyz="-3.42564660759106E-05"
+        izz="0.0588087610258628" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sag_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sag_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="sag_j"
+    type="revolute">
+    <origin
+      xyz="0.022 -0.3472 -0.199"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="sag_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="sag_o">
+    <inertial>
+      <origin
+        xyz="-3.9298380600794E-06 0.0800586393410085 2.22154740736613E-06"
+        rpy="0 0 0" />
+      <mass
+        value="8.75682890418114" />
+      <inertia
+        ixx="0.0688321928249745"
+        ixy="-4.15434121796129E-08"
+        ixz="-2.11260848353991E-06"
+        iyy="0.100525694194745"
+        iyz="-7.96632495670869E-09"
+        izz="0.0688305013296707" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sag_o.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sag_o.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="sag_o_j"
+    type="revolute">
+    <origin
+      xyz="0.43487 -0.254 -0.3367"
+      rpy="0 0 0" />
+    <parent
+      link="sag_link" />
+    <child
+      link="sag_o" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="sag_a">
+    <inertial>
+      <origin
+        xyz="0.0800586393410003 2.14850991298032E-06 -3.87824284747706E-06"
+        rpy="0 0 0" />
+      <mass
+        value="8.75682890418116" />
+      <inertia
+        ixx="0.100525694194746"
+        ixy="-4.64244759735467E-08"
+        ixz="-1.43757755185591E-08"
+        iyy="0.0688300152861216"
+        iyz="-2.2849513000961E-06"
+        izz="0.0688326788685239" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sag_a.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sag_a.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="sag_a_j"
+    type="revolute">
+    <origin
+      xyz="-0.45176 -0.254 -0.31186"
+      rpy="1.5708 0 1.5708" />
+    <parent
+      link="sag_link" />
+    <child
+      link="sag_a" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="sol_link">
+    <inertial>
+      <origin
+        xyz="-0.00403213602756075 0.000587467515973439 -0.164024175197258"
+        rpy="0 0 0" />
+      <mass
+        value="8.8819787542914" />
+      <inertia
+        ixx="0.0284879539667349"
+        ixy="-2.80809284336947E-05"
+        ixz="0.000741187145579073"
+        iyy="0.0840589420238504"
+        iyz="3.47129962072336E-05"
+        izz="0.058792754280351" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sol_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sol_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="sol_j"
+    type="revolute">
+    <origin
+      xyz="0.022 0.3528 -0.199"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="sol_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="sol_o">
+    <inertial>
+      <origin
+        xyz="-3.86323565354507E-06 -0.0800585812821633 2.14270840404041E-06"
+        rpy="0 0 0" />
+      <mass
+        value="8.75682890418117" />
+      <inertia
+        ixx="0.0688327497384188"
+        ixy="2.08766151623751E-08"
+        ixz="-2.20698762099804E-06"
+        iyy="0.100525694194746"
+        iyz="4.47654812054717E-08"
+        izz="0.0688299444162269" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sol_o.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sol_o.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="sol_o_j"
+    type="revolute">
+    <origin
+      xyz="0.44668 0.254 -0.31909"
+      rpy="0 0 0" />
+    <parent
+      link="sol_link" />
+    <child
+      link="sol_o" />
+    <axis
+      xyz="0 -1 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="sol_a">
+    <inertial>
+      <origin
+        xyz="-3.95840800532232E-06 0.0799414187164455 1.84018987392509E-06"
+        rpy="0 0 0" />
+      <mass
+        value="8.75682890454541" />
+      <inertia
+        ixx="0.0688329747856252"
+        ixy="-1.51754887726064E-08"
+        ixz="-1.58805974679325E-06"
+        iyy="0.10052569419963"
+        iyz="4.18024952449367E-08"
+        izz="0.0688297193756957" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sol_a.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://yürür_sistem_montaj_54/meshes/sol_a.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="sol_a_j"
+    type="revolute">
+    <origin
+      xyz="-0.44024 0.094 -0.32965"
+      rpy="0 0 0" />
+    <parent
+      link="sol_link" />
+    <child
+      link="sol_a" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+</robot>
