@@ -11,6 +11,10 @@ import math
 from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
 import numpy as np
 import struct
+from message_filters import Subscriber, ApproximateTimeSynchronizer
+
+
+odom_msg = Odometry()
 
 class OdometryPublisher(Node):
     def __init__(self):
@@ -20,17 +24,20 @@ class OdometryPublisher(Node):
 
         # Publisher for odometry data
         self.odom_publisher = self.create_publisher(Odometry, '/odom', 10)
-        self.subscription = self.create_subscription(
-            EncoderMsg,
-            '/encoder',
-            self.publish_odometry_and_transforms,
-            10
-        )
+        self.encoder_left_sub = Subscriber(self, EncoderMsg, '/encoder/left')  # Left wheels
+        self.encoder_right_sub = Subscriber(self, EncoderMsg, '/encoder/right')
 
         # Parameters
         self.declare_parameter('update_rate', 10)  # Hz
         self.declare_parameter('noise_level', 0.00)  # Maximum noise in meters/radians
-
+        
+        self.ts = ApproximateTimeSynchronizer(
+            [self.encoder_left_sub, self.encoder_right_sub], queue_size=10, slop=0.05,
+            allow_headerless = True
+        )
+        
+        self.ts.registerCallback(self.publish_odometry_and_transforms)
+        
         self.update_rate = self.get_parameter('update_rate').value
         self.noise_level = self.get_parameter('noise_level').value
 
@@ -41,10 +48,15 @@ class OdometryPublisher(Node):
         self.WHEEL_BASE = 0.94  # Distance between left and right wheels
         self.last_time = self.get_clock().now()
 
-
+        self.timer = self.create_timer(1/10 , self.timer_callback)
         # Publish static transforms
         self.publish_static_transforms()
-
+        
+        
+    def timer_callback(self):
+        self.odom_publisher.publish(odom_msg)
+        
+        
     def publish_static_transforms(self):
         # Static transform: base_footprint -> base_link
         base_footprint_to_base_link = TransformStamped()
@@ -75,30 +87,27 @@ class OdometryPublisher(Node):
         # Broadcast static transforms
         self.static_broadcaster.sendTransform([base_footprint_to_base_link, base_link_to_laser_frame])
 
-    def publish_odometry_and_transforms(self, msg : EncoderMsg):
+    def publish_odometry_and_transforms(self, encoder_left_msg: EncoderMsg, encoder_right_msg: EncoderMsg):
         current_time = self.get_clock().now()
 
-        V_left = (msg.m1 + msg.m3) /2 # Left wheels (m/s)
-        V_right = (msg.m2 + msg.m4) /2# Right wheels (m/s)
+        V_left = (encoder_left_msg.l_front + encoder_left_msg.l_back) / 2
+        V_right = (encoder_right_msg.r_front + encoder_right_msg.r_back) / 2
 
         V = (V_left + V_right) / 2
-        omega = (V_right - V_left) / (self.WHEEL_BASE)
+        omega = (V_right - V_left) / (self.WHEEL_BASE * 2)
 
-        current_time = self.get_clock().now()
-        dt = (current_time - self.last_time).nanoseconds / 1e9  # Convert ns to seconds
+        dt = (current_time - self.last_time).nanoseconds / 1e9
         self.last_time = current_time
 
-        # Update pose using odometry equations
         self.x += V * math.cos(self.theta) * dt
         self.y += V * math.sin(self.theta) * dt
         self.theta += omega * dt
-        # Publish odometry data
+
         odom_msg = Odometry()
         odom_msg.header.stamp = current_time.to_msg()
         odom_msg.header.frame_id = 'odom'
         odom_msg.child_frame_id = 'base_footprint'
 
-        # Pose
         odom_msg.pose.pose.position.x = self.x
         odom_msg.pose.pose.position.y = self.y
         odom_msg.pose.pose.position.z = 0.0
@@ -106,25 +115,35 @@ class OdometryPublisher(Node):
         odom_msg.pose.pose.orientation.y = 0.0
         odom_msg.pose.pose.orientation.z = math.sin(self.theta / 2.0)
         odom_msg.pose.pose.orientation.w = math.cos(self.theta / 2.0)
-        odom_msg.pose.covariance = [1e-5, 0.0, 0.0, 0.0, 0.0, 0.0,
-                                    0.0, 1e-5, 0.0, 0.0, 0.0, 0.0,
-                                    0.0, 0.0, 1e12, 0.0, 0.0, 0.0,
-                                    0.0, 0.0, 0.0, 1e12, 0.0, 0.0,
-                                    0.0, 0.0, 0.0, 0.0, 1e12, 0.0,
-                                    0.0, 0.0, 0.0, 0.0, 0.0, 1e-3]
 
-        # Twist
-        odom_msg.twist.twist.linear.x =  V * math.cos(self.theta)
+    # Make odometry less confident than IMU
+    # X, Y, and yaw covariances relaxed to reduce confidence
+        odom_msg.pose.covariance = [
+        0.05, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.05, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 1e-5, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 1e12, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 1e12, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.1  # Yaw
+    ]
+
+        odom_msg.twist.twist.linear.x = V * math.cos(self.theta)
         odom_msg.twist.twist.linear.y = V * math.sin(self.theta)
         odom_msg.twist.twist.linear.z = 0.0
         odom_msg.twist.twist.angular.x = 0.0
         odom_msg.twist.twist.angular.y = 0.0
         odom_msg.twist.twist.angular.z = omega
-        odom_msg.twist.covariance = odom_msg.pose.covariance
+        odom_msg.twist.covariance = [
+        0.05, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.05, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 1e-5, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 1e12, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.0, 1e12, 0.0,
+        0.0, 0.0, 0.0, 0.0, 0.0, 0.1  # Yaw
+    ]
 
         self.odom_publisher.publish(odom_msg)
 
-        # Publish dynamic transform: odom -> base_footprint
         odom_to_base_footprint = TransformStamped()
         odom_to_base_footprint.header.stamp = current_time.to_msg()
         odom_to_base_footprint.header.frame_id = 'odom'
@@ -136,8 +155,6 @@ class OdometryPublisher(Node):
         odom_to_base_footprint.transform.rotation.y = 0.0
         odom_to_base_footprint.transform.rotation.z = math.sin(self.theta / 2.0)
         odom_to_base_footprint.transform.rotation.w = math.cos(self.theta / 2.0)
-
-        self.tf_broadcaster.sendTransform(odom_to_base_footprint)
 
 
 def main():
