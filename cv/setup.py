@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "aruco=cv.aruco:main"
+            "aruco=cv.aruco:main",
+            "pub=cv.camera_pub:main"
         ],
     },
 )
